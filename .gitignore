@@ -1,0 +1,19 @@
+# Files MATLAB and Simulink create while working
+slprj/
+*.slxc
+*.asv
+*.autosave
+*.mexw64
+*.mat
+
+# SolidWorks lock files, made while a file is open
+~$*
+
+# log that Simscape Multibody Link writes next to an export
+*_error.txt
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

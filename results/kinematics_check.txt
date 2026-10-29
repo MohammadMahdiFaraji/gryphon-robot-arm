@@ -1,0 +1,26 @@
+Kinematics check, 2026-10-30
+
+1) SolidWorks pose [-17.291 -4.252 63.768 0.513]
+   tool point from CAD   [451.925 -122.120 675.339] mm
+   forward_kinematics    [451.925 -122.119 675.339] mm   difference 0.001 mm
+
+2) Simscape model vs forward_kinematics (tool point) and gripper.m (fingertips)
+   theta = [0 45 -45 -45]             g = 15   Simscape [  547.10    17.72   435.68]  FK [  547.11    17.72   435.68]  diff 0.0006 mm   fingertips 45.6 mm apart, diff 0.0016 mm
+   theta = [-17.291 -4.252 63.768 0.513] g =  0   Simscape [  451.93  -122.12   675.34]  FK [  451.93  -122.12   675.34]  diff 0.0010 mm   fingertips 6.2 mm apart, diff 0.0018 mm
+   theta = [0 0 0 0]                  g = 30   Simscape [  652.04    17.72   372.00]  FK [  652.04    17.72   372.00]  diff 0.0009 mm   fingertips 85.0 mm apart, diff 0.0017 mm
+   theta = [90 30 -60 20]             g = 10   Simscape [  -17.72   588.29   342.55]  FK [  -17.72   588.29   342.56]  diff 0.0007 mm   fingertips 32.0 mm apart, diff 0.0016 mm
+   theta = [-45 60 -90 -80]           g = 25   Simscape [  244.68  -219.62   321.87]  FK [  244.68  -219.62   321.87]  diff 0.0008 mm   fingertips 72.3 mm apart, diff 0.0015 mm
+   theta = [110 -15 40 -60]           g =  5   Simscape [ -221.18   555.87   337.00]  FK [ -221.18   555.87   337.00]  diff 0.0009 mm   fingertips 18.3 mm apart, diff 0.0017 mm
+   theta = [-50 70 50 55]             g = 30   Simscape [  -62.19   101.68   799.12]  FK [  -62.19   101.68   799.12]  diff 0.0009 mm   fingertips 85.0 mm apart, diff 0.0013 mm
+   theta = [30 10 -30 -20]            g =  0   Simscape [  513.35   316.85   243.84]  FK [  513.35   316.85   243.85]  diff 0.0007 mm   fingertips 6.2 mm apart, diff 0.0017 mm
+   largest difference: tool point 0.0010 mm, fingertips 0.0018 mm
+
+3) IK round trip: 20000 random poses, 27542 IK solutions within the limits
+   largest position error: 6.6e-13 mm
+
+4) targets that must be refused
+   [900 0 400]      phi    0: ok = 0 (the target is out of reach)
+   [5 3 600]        phi    0: ok = 0 (the target is too close to the base axis)
+   [420 0 -20]      phi  -45: ok = 0 (the gripper would go below the floor)
+   [120 -18 100]    phi -170: ok = 0 (the gripper would hit the base of the robot)
+   [-400 -100 300]  phi  -45: ok = 0 (joint 1 would need -168.4 deg (limit -52.3 to 117.7))
