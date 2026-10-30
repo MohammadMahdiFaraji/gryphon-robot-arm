@@ -129,12 +129,21 @@ end
 end
 
 function connect_frames(sys, ref_block, transform_block, port_block)
-% Reference frame -> rigid transform -> connection port, inside a part subsystem
+% Reference frame -> rigid transform -> connection port, inside a part subsystem.
+% The two new blocks go under the blocks that smimport made, so they do not sit on top of them.
+old = setdiff(find_system(sys, 'SearchDepth', 1, 'Type', 'Block'), {sys, [sys '/' transform_block], [sys '/' port_block]});
+pos = cell2mat(get_param(old, 'Position'));
+y = max(pos(:, 4)) + 40;
+x = get_param([sys '/' ref_block], 'Position');
+set_param([sys '/' transform_block], 'Position', [x(1) + 150, y, x(1) + 190, y + 40]);
+set_param([sys '/' port_block], 'Position', [x(1) + 300, y + 12, x(1) + 330, y + 28], ...
+    'Orientation', 'left');                      % like the ports smimport made
+
 r = get_param([sys '/' ref_block], 'PortHandles');
 t = get_param([sys '/' transform_block], 'PortHandles');
 c = get_param([sys '/' port_block], 'PortHandles');
-add_line(sys, r.RConn(1), t.LConn(1));
-add_line(sys, t.RConn(1), c.RConn(1));
+add_line(sys, r.RConn(1), t.LConn(1), 'autorouting', 'on');
+add_line(sys, t.RConn(1), c.RConn(1), 'autorouting', 'on');
 end
 
 function add_sensor(model, base, follower, name, display_name, variable)
