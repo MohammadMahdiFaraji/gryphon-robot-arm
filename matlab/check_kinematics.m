@@ -3,6 +3,7 @@
 %   2. forward_kinematics and gripper.m against the Simscape model (its own sensors)
 %   3. inverse_kinematics -> forward_kinematics round trip for random poses
 %   4. targets that must be refused
+%   5. the mates of the CAD file (how many joints) and the DH frames against the joint axes
 % The output is also saved to results/kinematics_check.txt
 %
 % MohammadMahdi Faraji, mmyasharfaraji@gmail.com
@@ -32,6 +33,9 @@ if license('test', 'SimMechanics')          % the license name of Simscape Multi
     poses = [p.home p.grip_home; p.cad_pose 0; 0 0 0 0 30; 90 30 -60 20 10;
              -45 60 -90 -80 25; 110 -15 40 -60 5; -50 70 50 55 30; 30 10 -30 -20 0];
     fprintf('2) Simscape model vs forward_kinematics (tool point) and gripper.m (fingertips)\n');
+    joints = find_system(model, 'LookUnderMasks', 'all', 'FollowLinks', 'on', 'Regexp', 'on', ...
+        'ReferenceBlock', '^sm_lib/Joints/');
+    fprintf('   the model has %d joints: %s\n', numel(joints), strjoin(sort(strrep(joints, [model '/'], '')), ', '));
     worst = 0;  worst_finger = 0;
     for k = 1:size(poses, 1)
         for i = 1:4
@@ -83,4 +87,67 @@ for k = 1:size(tests, 1)
     [~, ok, msg] = inverse_kinematics(tests{k, 1}, tests{k, 2});
     fprintf('   %-16s phi %4d: ok = %d (%s)\n', mat2str(tests{k, 1}), tests{k, 2}, ok, msg);
 end
+
+% 5. gryphon.xml lists every mate of the assembly, with a point and a direction on each of
+%    the two parts. Two parts that can turn have a concentric mate, and its line is the joint
+%    axis. In the SolidWorks pose, the z axis of DH frame i-1 must lie on the axis of joint i.
+fprintf('\n5) mates in gryphon.xml and the DH frames on the joint axes (SolidWorks pose)\n');
+xml_file = fullfile(here, '..', 'simulink', 'gryphon.xml');
+mates = read_mates(xml_file);
+pairs = cellfun(@(u) strjoin(sort(u), ' + '), {mates.uid}, 'UniformOutput', false);
+[pair_names, ~, which] = unique(pairs);
+turning = 0;  locked = 0;
+for k = 1:numel(pair_names)
+    types = {mates(which == k).type};
+    turning = turning + any(strcmp(types, 'Concentric'));
+    locked = locked + any(strcmp(types, 'UnknownConstraint'));     % the Lock mates
+end
+fprintf('   %d mates join the %d parts in %d pairs: %d pairs turn about a concentric mate, %d are locked\n', ...
+    numel(mates), numel(unique([mates.uid])), numel(pair_names), turning, locked);
+
+% part frame -> base frame, the same base frame as in load_arm_parts.m
+pose = read_cad_poses(xml_file);
+R0 = [0 0 1; 1 0 0; 0 1 0];
+column = pose.(matlab.lang.makeValidName('part8-shaft3-1'));
+plate = pose.(matlab.lang.makeValidName('part7-1'));
+O0 = [column.t(1); plate.t(2); column.t(3)];
+[~, ~, frames] = forward_kinematics(p.cad_pose);
+joint_mates = {'waist', 'Concentric2'; 'shoulder', 'Concentric shoulder (arm in body bore)';
+               'elbow', 'Concentric7'; 'wrist', 'Concentric11'};
+for i = 1:4
+    m = mates(strcmp({mates.name}, joint_mates{i, 2}));
+    P = pose.(matlab.lang.makeValidName(m.uid{1}));
+    point = R0 * (P.R * m.point{1} + P.t - O0);      % a point on the joint axis
+    u = R0 * P.R * m.dir{1};
+    u = u / norm(u);                                 % direction of the joint axis
+    z = frames(1:3, 3, i);                           % z axis of frame i-1
+    o = frames(1:3, 4, i);                           % origin of frame i-1
+    fprintf('   z%d on the %-8s axis: angle %.4f deg, origin of frame %d is %.4f mm from the axis\n', ...
+        i - 1, joint_mates{i, 1}, acosd(min(1, abs(z' * u))), i - 1, norm(cross(o - point, u)));
+end
 diary off;
+
+
+function mates = read_mates(xml_file)
+% every mate in gryphon.xml: type, name, the two part instances, and on each of them a point
+% (mm) and a direction, written in the frame of that part
+doc = xmlread(xml_file);
+list = doc.getElementsByTagName('Constraints').item(0).getChildNodes;
+mates = struct('type', {}, 'name', {}, 'uid', {}, 'point', {}, 'dir', {});
+for i = 0:list.getLength - 1
+    node = list.item(i);
+    if node.getNodeType ~= 1, continue; end          % 1 = an XML element (skip line breaks)
+    m = struct('type', char(node.getNodeName), 'name', char(node.getAttribute('name')), ...
+        'uid', {{}}, 'point', {{}}, 'dir', {{}});
+    geom = node.getElementsByTagName('ConstraintGeometry');
+    for k = 0:geom.getLength - 1
+        g = geom.item(k);
+        m.uid{k + 1} = char(g.getElementsByTagName('Uid').item(0).getTextContent);
+        if g.getElementsByTagName('Position').getLength > 0        % a Lock mate has none
+            m.point{k + 1} = 1000 * sscanf(char(g.getElementsByTagName('Position').item(0).getTextContent), '%f');
+            m.dir{k + 1} = sscanf(char(g.getElementsByTagName('Axis').item(0).getTextContent), '%f');
+        end
+    end
+    mates(end + 1) = m;
+end
+end

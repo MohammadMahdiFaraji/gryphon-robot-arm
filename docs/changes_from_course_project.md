@@ -35,7 +35,7 @@ The course version had no kinematics code. Everything in `matlab/` is new:
 - `forward_kinematics.m`, `inverse_kinematics.m` (closed form, with the gripper angle as input and elbow up or down), `check_pose.m` (joint limits, floor and base), `plan_line.m` (straight lines) and `gripper.m` (the two fingers).
 - `load_arm_parts.m` and `draw_arm.m`: the real CAD parts drawn in 3D for any pose.
 - `arm_gui.m`: a window with sliders for the joints and the gripper, inverse kinematics on joint space or straight line paths, Home, Reset view, Start and Stop, and a switch that runs the Simscape model and makes it follow the window.
-- `check_kinematics.m`: all checks in one script, with the results saved in `results/kinematics_check.txt`.
+- `check_kinematics.m`: all checks in one script, with the results saved in `results/kinematics_check.txt`. It also counts the joints of the assembly and of the Simscape model, and checks that every DH frame sits on its joint axis in the CAD file.
 - `plot_workspace.m` and `pick_and_place.m`: the reachable area seen from the side, and a demo that picks up a block and puts it down with straight line moves.
 - `click_to_fast_start` in the main folder, which opens the window with one click.
 

@@ -1,10 +1,11 @@
-Kinematics check, 2026-10-30
+Kinematics check, 2026-10-31
 
 1) SolidWorks pose [-17.291 -4.252 63.768 0.513]
    tool point from CAD   [451.925 -122.120 675.339] mm
    forward_kinematics    [451.925 -122.119 675.339] mm   difference 0.001 mm
 
 2) Simscape model vs forward_kinematics (tool point) and gripper.m (fingertips)
+   the model has 6 joints: Finger1, Finger2, Joint1, Joint2, Joint3, Joint4
    theta = [0 45 -45 -45]             g = 15   Simscape [  547.10    17.72   435.68]  FK [  547.11    17.72   435.68]  diff 0.0006 mm   fingertips 45.6 mm apart, diff 0.0016 mm
    theta = [-17.291 -4.252 63.768 0.513] g =  0   Simscape [  451.93  -122.12   675.34]  FK [  451.93  -122.12   675.34]  diff 0.0010 mm   fingertips 6.2 mm apart, diff 0.0018 mm
    theta = [0 0 0 0]                  g = 30   Simscape [  652.04    17.72   372.00]  FK [  652.04    17.72   372.00]  diff 0.0009 mm   fingertips 85.0 mm apart, diff 0.0017 mm
@@ -24,3 +25,10 @@ Kinematics check, 2026-10-30
    [420 0 -20]      phi  -45: ok = 0 (the gripper would go below the floor)
    [120 -18 100]    phi -170: ok = 0 (the gripper would hit the base of the robot)
    [-400 -100 300]  phi  -45: ok = 0 (joint 1 would need -168.4 deg (limit -52.3 to 117.7))
+
+5) mates in gryphon.xml and the DH frames on the joint axes (SolidWorks pose)
+   16 mates join the 10 parts in 9 pairs: 6 pairs turn about a concentric mate, 3 are locked
+   z0 on the waist    axis: angle 0.0000 deg, origin of frame 0 is 0.0000 mm from the axis
+   z1 on the shoulder axis: angle 0.0001 deg, origin of frame 1 is 0.0000 mm from the axis
+   z2 on the elbow    axis: angle 0.0001 deg, origin of frame 2 is 0.0004 mm from the axis
+   z3 on the wrist    axis: angle 0.0001 deg, origin of frame 3 is 0.0005 mm from the axis

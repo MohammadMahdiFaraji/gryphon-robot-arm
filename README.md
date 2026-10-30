@@ -46,12 +46,13 @@ There are three independent ways to find the tool point (half way between the fi
 | forward kinematics vs the Simscape model (its own sensor), 8 poses | 0.0010 mm |
 | fingertips from `gripper.m` vs the Simscape model, the same 8 poses | 0.0018 mm |
 | inverse kinematics, then forward kinematics again, 20000 random poses | about 1e-12 mm |
+| DH frames vs the joint axes in the SolidWorks file (each z axis on its joint axis) | 0.0005 mm |
 
 The Simscape model is the independent check. It is built only from the CAD export and does not use my DH table, only a sign and an offset per joint to turn my angles into its own. Sensors in the model measure the tool point and both fingertips, so a mistake of even one millimetre in the table would show up there.
 
 These numbers say that the math matches the CAD model. How well the CAD model matches the real robot depends on my measurements, and that has not been checked on the robot yet.
 
-`matlab/check_kinematics.m` runs all the checks, including targets that must be refused (too far, on the base axis, under the floor, into the base, behind the robot), and writes [results/kinematics_check.txt](results/kinematics_check.txt).
+`matlab/check_kinematics.m` runs all the checks and writes [results/kinematics_check.txt](results/kinematics_check.txt). It also tries targets that must be refused (too far, on the base axis, under the floor, into the base, behind the robot), and it counts the joints: the mates of the assembly leave exactly six (four arm joints and two fingers), and the Simscape model has exactly six.
 
 ## How it works
 
@@ -161,6 +162,7 @@ matlab/         kinematics, checks, demo and the GUI
   gripper.m             the two fingers for a gripper angle
   plan_line.m           straight line paths
   load_arm_parts.m, draw_arm.m   draw the real parts in 3D
+  read_cad_poses.m      where each part sits in the SolidWorks export
 results/        kinematics_check.txt and figures
 media/          GIF and pictures for this page
 docs/           the DH table explained, changes since the course version

@@ -121,7 +121,7 @@ ends = {};
 for l = [h.LConn(:); h.RConn(:)]'
     if l <= 0, continue; end
     b = [get_param(l, 'SrcBlockHandle'); get_param(l, 'DstBlockHandle')];
-    ends = [ends, arrayfun(@(x) get_param(x, 'Name'), b(b > 0)', 'UniformOutput', false)]; %#ok<AGROW>
+    ends = [ends, arrayfun(@(x) get_param(x, 'Name'), b(b > 0)', 'UniformOutput', false)];
 end
 if ~all(ismember(row(3:4), ends))
     error('%s does not join %s and %s. Was the CAD exported again? Update the joint list.', row{1}, row{3}, row{4});

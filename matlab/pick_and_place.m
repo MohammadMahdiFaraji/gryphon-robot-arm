@@ -36,10 +36,10 @@ for k = 1:size(moves, 1)
         rows = gripper_move(path(end, :), moves{k, 2});
     else
         rows = line_move(path(end, :), moves{k, 1}, phi);
-        lines(end + 1, :) = size(path, 1) + [0 size(rows, 1)]; %#ok<SAGROW>
+        lines(end + 1, :) = size(path, 1) + [0 size(rows, 1)];
     end
-    path = [path; rows]; %#ok<AGROW>
-    holding = [holding; repmat(moves{k, 3}, size(rows, 1), 1)]; %#ok<AGROW>
+    path = [path; rows];
+    holding = [holding; repmat(moves{k, 3}, size(rows, 1), 1)];
 end
 home = joint_move(path(end, :), [p.home p.grip_home]);     % back home
 path = [path; home(2:end, :)];
@@ -105,7 +105,7 @@ for k = 1:size(path, 1)
     set(trail, 'XData', tool(1:k, 1), 'YData', tool(1:k, 2), 'ZData', tool(1:k, 3));
     if mod(k, 2) == 1 || k == size(path, 1)
         f = getframe(fig);
-        frames{end + 1} = f.cdata; %#ok<SAGROW>
+        frames{end + 1} = f.cdata;
     end
 end
 close(fig);

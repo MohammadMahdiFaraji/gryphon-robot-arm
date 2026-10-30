@@ -57,6 +57,10 @@ The upper arm is almost level, the forearm points up, and the gripper continues 
 
 There is a second check, which is easy to see: `load_arm_parts.m` attaches every STL mesh to its DH frame in this CAD pose. When `draw_arm.m` then draws the robot in any other pose, the parts stay joined at the joints. With a wrong table, they would drift apart.
 
+A third check looks at the frames themselves. In standard DH, the z axis of frame i-1 must lie on the axis of joint i, and the XML gives every joint axis as the line of its concentric mate. In the CAD pose, z0, z1, z2 and z3 lie on the waist, shoulder, elbow and wrist axes. The largest angle between a z axis and its joint axis is 0.0001 degrees, and every frame origin is at most 0.0005 mm from its axis, which is only the rounding of the table to three decimals.
+
+The same mates also show how many joints there are. The 16 mates join the 10 part instances in 9 pairs. Six pairs have a concentric mate and can turn (the four arm joints and the two fingers), and three pairs are held by a Lock mate. So the assembly has exactly six joints, and the Simscape model built from it has six revolute joints and nothing else.
+
 ## Joint limits
 
 My course model moved every joint with a slider, measured from the pose of the CAD file. The limits are the same ranges, written as DH angles: `limits = cad_pose + slider range`.
@@ -92,3 +96,5 @@ The signs were found by turning each joint by +20 degrees in the model and compa
 - **Forward kinematics vs the Simscape model:** 0.0010 mm in 8 poses. The model has its own transform sensor between the base and the tool point.
 - **gripper.m vs the Simscape model:** 0.0018 mm for both fingertips, in the same 8 poses with different gripper angles.
 - **Inverse kinematics followed by forward kinematics:** back to the same point within 1e-12 mm, over 20000 random poses.
+- **DH frames vs the joint axes in the CAD file:** z0 to z3 lie on the four joint axes within 0.0001 degrees and 0.0005 mm.
+- **Joints:** 6 pairs of parts turn and 3 are locked, and the Simscape model has exactly 6 revolute joints.

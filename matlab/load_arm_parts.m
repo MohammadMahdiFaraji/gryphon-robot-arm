@@ -53,19 +53,3 @@ for k = 1:n
     parts(k).finger = list{k, 4};
 end
 end
-
-
-function pose = read_cad_poses(xml_file)
-% rotation and translation (mm) of every part instance in gryphon.xml
-doc = xmlread(xml_file);
-list = doc.getElementsByTagName('Instance');
-pose = struct();
-for i = 0:list.getLength - 1
-    node = list.item(i);
-    uid = char(node.getAttribute('uid'));
-    R = sscanf(char(node.getElementsByTagName('Rotation').item(0).getTextContent), '%f');
-    t = sscanf(char(node.getElementsByTagName('Translation').item(0).getTextContent), '%f');
-    pose.(matlab.lang.makeValidName(uid)).R = reshape(R, 3, 3)';   % the file lists the rows
-    pose.(matlab.lang.makeValidName(uid)).t = 1000 * t(:);         % m -> mm
-end
-end
