@@ -4,6 +4,12 @@
 
 The Gryphon EC is a small five-axis robot arm made by Italtec for teaching. One of them stands in the lab of Dr. Amir Rikhtehgar Ghiasi at the University of Tabriz. Its old controller and computer had burned out, and the lab wanted to bring it back with a new control system and a much better accuracy. To start, I measured every part of the robot with a caliper and a tape measure and drew it in SolidWorks. This repository turns that drawing into a working model: the math between joint angles and gripper position, a Simscape model built from the same CAD files, and a window to move the robot with sliders or by typing a target.
 
+<p align="center">
+  <img src="media/gryphon-lab-front.jpg" width="43%" alt="Gryphon EC arm on the laboratory bench, with the model label and gripper visible">
+  <img src="media/gryphon-lab-side.jpg" width="43%" alt="Side view of the Gryphon EC arm and its two-finger gripper, with a caliper on the bench">
+</p>
+<p align="center"><sub>The Gryphon EC in Dr. Amir Rikhtehgar Ghiasi’s laboratory at the University of Tabriz. Measurements taken from this arm were used to build the SolidWorks model.</sub></p>
+
 <p align="center"><img src="media/pick_and_place.gif" width="65%"></p>
 <p align="center"><sub>The robot picks up a 30 mm block and puts it down 320 mm further on, with the gripper pointing straight down. The moves down, up and across are straight lines, and every point of them is solved with inverse kinematics.</sub></p>
 
